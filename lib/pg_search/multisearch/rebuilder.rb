@@ -13,10 +13,11 @@ module PgSearch
       def rebuild
         if model.respond_to?(:rebuild_pg_search_documents)
           model.rebuild_pg_search_documents
-        elsif conditional? || dynamic?
-          model.find_each { |record| record.update_pg_search_document }
-        else
-          model.connection.execute(rebuild_sql)
+          else model.find_each { |record| record.update_pg_search_document }
+        # elsif conditional? || dynamic?
+        #   model.find_each { |record| record.update_pg_search_document }
+        # else
+        #   model.connection.execute(rebuild_sql)
         end
       end
 
