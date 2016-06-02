@@ -1,5 +1,5 @@
 # -*- encoding: utf-8 -*-
-$:.push File.expand_path("../lib", __FILE__)
+$LOAD_PATH.push File.expand_path('../lib', __FILE__)
 require "pg_search/version"
 
 Gem::Specification.new do |s|
@@ -25,7 +25,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'pry'
   s.add_development_dependency 'rspec', '>= 3.3'
   s.add_development_dependency 'with_model', '>= 1.2'
-  s.add_development_dependency 'rubocop', '~> 0.35.1'
+  s.add_development_dependency 'rubocop', '>= 0.36'
 
   s.required_ruby_version = ">= 1.9.2"
 end

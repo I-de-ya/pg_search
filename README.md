@@ -244,6 +244,8 @@ PgSearch.multisearch("Alamo").page(3).per(30)
 PgSearch.multisearch("Diagonal").find_each do |document|
   puts document.searchable.updated_at
 end
+PgSearch.multisearch("Moro").reorder("").group(:searchable_type).count(:all)
+PgSearch.multisearch("Square").includes(:searchable)
 ```
 
 #### Configuring multi-search
@@ -734,6 +736,34 @@ one_close = Person.create!(:name => 'leigh heinz')
 Person.search('ash hines') # => [exact, one_exact_one_close, one_exact]
 ```
 
+##### :highlight (PostgreSQL 9.0 and newer only)
+
+Adding .with_pg_search_highlight after the pg_search_scope you can access to
+`pg_highlight` attribute for each object.
+
+
+```ruby
+class Person < ActiveRecord::Base
+  include PgSearch
+  pg_search_scope :search,
+                  :against => :bio,
+                  :using => {
+                    :tsearch => {
+                      :start_sel => '<b>',
+                      :stop_sel => '</b>'
+                    }
+                  }
+end
+
+Person.create!(:bio => "Born in rural Alberta, where the buffalo roam.")
+
+first_match = Person.search("Alberta").with_pg_search_highlight.first
+first_match.pg_search_highlight # => "Born in rural <b>Alberta</b>, where the buffalo roam."
+```
+
+By default, it will add the delimiters `<b>` and `</b>` around the matched text. You can customize these delimiters and the number of fragments returned with the `:start_sel`, `stop_sel`, and `max_fragments` options.
+
+
 #### :dmetaphone (Double Metaphone soundalike search)
 
 [Double Metaphone](http://en.wikipedia.org/wiki/Double_Metaphone) is an
@@ -1071,7 +1101,7 @@ queried table.
 ```ruby
 shirt_brands = ShirtBrand.search_by_name("Penguin")
   .joins(:shirt_sizes)
-  .group('shirt_brands.id, #{PgSearch::Configuration.alias('shirt_brands')}.rank')
+  .group("shirt_brands.id, #{PgSearch::Configuration.alias('shirt_brands')}.rank")
 ```
 
 ## ATTRIBUTIONS
